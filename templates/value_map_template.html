@@ -1,7 +1,10 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>LaLiga Fantasy Value Map</title>
 <style>
-.viz-root {
-  color-scheme: light;
+:root {
+  color-scheme: light dark;
   --surface-1:      #fcfcfb;
   --page:           #f9f9f7;
   --text-primary:   #0b0b0b;
@@ -19,7 +22,7 @@
   --highlight:      #eda100;
 }
 @media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) .viz-root {
+  :root:where(:not([data-theme="light"])) {
     color-scheme: dark;
     --surface-1:      #1a1a19;
     --page:           #0d0d0d;
@@ -38,7 +41,7 @@
     --highlight:      #c98500;
   }
 }
-:root[data-theme="dark"] .viz-root {
+:root[data-theme="dark"] {
   color-scheme: dark;
   --surface-1:      #1a1a19;
   --page:           #0d0d0d;
@@ -57,7 +60,13 @@
   --highlight:      #c98500;
 }
 * { box-sizing: border-box; }
-body { background: var(--page); }
+html { background: var(--page); }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text-primary);
+  -webkit-text-size-adjust: 100%;
+}
 .viz-root {
   background: var(--page);
   color: var(--text-primary);
