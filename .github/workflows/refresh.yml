@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # full history so rebase-before-push is reliable
 
       - name: Build the value map
         shell: pwsh
@@ -28,14 +30,25 @@ jobs:
           ./scripts/generate_value_map.ps1 -ProjectRoot .
           Copy-Item laliga_value_map.html index.html -Force
 
-      - name: Commit if changed
+      - name: Commit and push if changed
         run: |
           git config user.name  "laliga-refresh-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html data/archive
           if git diff --cached --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "refresh $(date -u +'%Y-%m-%d %H:%MZ')"
-            git push
+            exit 0
           fi
+          git commit -m "refresh $(date -u +'%Y-%m-%d %H:%MZ')"
+          # The branch may have moved since checkout (a human push, or another run).
+          # Rebase onto the latest and retry a few times before giving up.
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "attempt $attempt failed; retrying in 5s"
+            sleep 5
+          done
+          echo "could not push after 5 attempts" >&2
+          exit 1
