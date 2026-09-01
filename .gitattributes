@@ -1,2 +1,7 @@
+* text=auto eol=lf
+scripts/*.ps1 text eol=lf
+templates/*.html text eol=lf
 index.html -text
+laliga_value_map.html -text
 .nojekyll -text
+data/archive/*.json -text

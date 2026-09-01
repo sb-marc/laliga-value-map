@@ -1,0 +1,41 @@
+name: Daily refresh
+
+# Rebuilds index.html from the live Biwenger feed and commits it back.
+# GitHub Pages (deploy-from-branch) then serves the new build automatically.
+# Runs entirely on GitHub's servers - no laptop involved.
+
+on:
+  schedule:
+    - cron: "10 5 * * *"   # 05:10 UTC  (~07:10 CEST summer / 06:10 CET winter)
+  workflow_dispatch: {}     # "Run workflow" button for manual / test runs
+
+permissions:
+  contents: write           # let the job commit index.html + data/archive back
+
+concurrency:
+  group: daily-refresh
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the value map
+        shell: pwsh
+        run: |
+          ./scripts/generate_value_map.ps1 -ProjectRoot .
+          Copy-Item laliga_value_map.html index.html -Force
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "laliga-refresh-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html data/archive
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "refresh $(date -u +'%Y-%m-%d %H:%MZ')"
+            git push
+          fi

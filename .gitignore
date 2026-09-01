@@ -1,0 +1,9 @@
+# build intermediate - only index.html (its copy) is committed
+/laliga_value_map.html
+
+# per-day working copies the generator also writes - not needed in the repo
+/data/laliga_raw_2*.json
+/data/laliga_players_2*.csv
+/data/laliga_raw_latest.json
+
+# kept: index.html, data/archive/**  (the deduplicated backlog + manifest)
